@@ -4,7 +4,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import pers.xyy.api_replacement_tool.resource.ReplaceResource;
 import pers.xyy.api_replacement_tool.service.IReplaceService;
 
 @RestController
@@ -13,6 +12,12 @@ public class ReplaceController {
 
     @Autowired
     private IReplaceService service;
+
+    @GetMapping(value = "clear")
+    @CrossOrigin
+    public void clear(){
+        service.clear();
+    }
 
     @GetMapping(value = "/examples")
     @CrossOrigin

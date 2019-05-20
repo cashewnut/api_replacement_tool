@@ -4,6 +4,8 @@ import pers.xyy.api_replacement_tool.resource.Response;
 
 public interface IReplaceService {
 
+    public void clear();
+
     public String getExamples();
 
     public Response analyze(String code);

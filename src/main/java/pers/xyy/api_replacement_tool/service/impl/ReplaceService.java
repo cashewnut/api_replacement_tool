@@ -33,6 +33,12 @@ public class ReplaceService implements IReplaceService {
     private IVisitorService visitorService;
 
     @Override
+    public void clear() {
+        stack.clear();
+        replacedCode = null;
+    }
+
+    @Override
     public String getExamples() {
         try {
             String path = ApiReplacementToolApplication.class.getResource("/examples/ExampleA").toURI().getPath();
