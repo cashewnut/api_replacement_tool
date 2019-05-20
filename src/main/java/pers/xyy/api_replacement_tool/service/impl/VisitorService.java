@@ -34,6 +34,12 @@ public class VisitorService implements IVisitorService {
         replace(replacedCode, mc);
     }
 
+    @Override
+    public void replaceAll(ReplacedCode replacedCode) {
+        for (MethodCallExpr mc : replacedCode.getMethodCallExprs())
+            replace(replacedCode, mc);
+    }
+
     private void replace(ReplacedCode replacedCode, MethodCallExpr mc) {
         DeprecatedAPI api = service.getByMethodCallExpr(mc);
         if (api == null)

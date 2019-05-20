@@ -30,18 +30,22 @@ public class ReplaceController {
         return JSON.toJSONString(service.analyze(code));
     }
 
-    @ResponseBody
-    @PostMapping(value = "/replace")
+    @GetMapping(value = "/replace/{index}")
     @CrossOrigin
-    public String replace(@RequestBody String code) {
-        ReplaceResource replaceResource = JSON.parseObject(code, ReplaceResource.class);
-        return JSON.toJSONString(service.replace(replaceResource));
+    public String replace(@PathVariable("index") int index) {
+        return JSON.toJSONString(service.replace(index));
     }
 
     @GetMapping(value = "/revert")
     @CrossOrigin
     public String revert() {
         return JSON.toJSONString(service.revert());
+    }
+
+    @GetMapping(value = "/replaceall")
+    @CrossOrigin
+    public String replaceAll() {
+        return JSON.toJSONString(service.replaceAll());
     }
 
 }

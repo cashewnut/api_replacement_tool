@@ -6,4 +6,6 @@ public interface IVisitorService {
 
     public void replace(ReplacedCode replacedCode, int index);
 
+    public void replaceAll(ReplacedCode replacedCode);
+
 }

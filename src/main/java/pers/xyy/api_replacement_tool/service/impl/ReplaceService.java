@@ -9,10 +9,9 @@ import pers.xyy.api_replacement_tool.ResponseCode;
 import pers.xyy.api_replacement_tool.exceptions.ImportsIncompleteException;
 import pers.xyy.api_replacement_tool.model.Line;
 import pers.xyy.api_replacement_tool.model.ReplacedCode;
-import pers.xyy.api_replacement_tool.resource.ReplaceResource;
 import pers.xyy.api_replacement_tool.resource.Response;
-import pers.xyy.api_replacement_tool.service.IReplacedCodeService;
 import pers.xyy.api_replacement_tool.service.IReplaceService;
+import pers.xyy.api_replacement_tool.service.IReplacedCodeService;
 import pers.xyy.api_replacement_tool.service.IVisitorService;
 import pers.xyy.api_replacement_tool.utils.BoundedStack;
 import pers.xyy.api_replacement_tool.utils.FileUtil;
@@ -48,41 +47,32 @@ public class ReplaceService implements IReplaceService {
 
     @Override
     public Response analyze(String code) {
-        stack.clear();
-        Response response = null;
         try {
             replacedCode = service.getReplaceCode(code);
+            stack.push(replacedCode.getCu().clone());
             List<Line> lines = replacedCode.getLines();
             for (Line line : lines) {
                 System.out.println(line.getContent());
                 System.out.println(line.getIndex());
             }
-            response = new Response(replacedCode.getLines());
+            return new Response(replacedCode.getLines());
         } catch (ParseProblemException ppe) {
-            response = new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
+            return new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
         } catch (ImportsIncompleteException iie) {
-            response = new Response(ResponseCode.IMPORTS_INCOMPLETE.getValue(), iie.getMessage());
+            return new Response(ResponseCode.IMPORTS_INCOMPLETE.getValue(), iie.getMessage());
         }
-        return response;
     }
 
     @Override
-    public Response replace(ReplaceResource replaceResource) {
-        stack.push(replacedCode.getCu().clone());//保存现场
-        if (!replaceResource.getCode().equals(replacedCode.getCu().toString())) {
-            System.out.println("changed");
-            try {
-                replacedCode = service.getReplaceCode(replaceResource.getCode());
-            } catch (ParseProblemException ppe) {
-                return new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
-            } catch (ImportsIncompleteException iie) {
-                return new Response(ResponseCode.IMPORTS_INCOMPLETE.getValue(), iie.getMessage());
-            }
-        }
+    public Response replace(int index) {
         try {
-            visitorService.replace(replacedCode, replaceResource.getIndex());
-            replacedCode = service.getReplaceCode(replacedCode.getCu().toString());
+            visitorService.replace(replacedCode, index);
+            service.initLines(replacedCode);
             return new Response(replacedCode.getLines());
+        } catch (ParseProblemException ppe) {
+            return new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
+        } catch (ImportsIncompleteException iie) {
+            return new Response(ResponseCode.IMPORTS_INCOMPLETE.getValue(), iie.getMessage());
         } catch (Exception e) {
             return new Response(ResponseCode.UNKNOWN_EXCEPTION.getValue(), e.getMessage());
         }
@@ -96,6 +86,26 @@ public class ReplaceService implements IReplaceService {
             response.setResponseCode(ResponseCode.SUCCESS_CANNOT_REVERT.getValue());
         return analyze(code);
     }
+
+    @Override
+    public Response replaceAll() {
+        try {
+            visitorService.replaceAll(replacedCode);
+            service.initLines(replacedCode);
+            return new Response(replacedCode.getLines());
+        } catch (ParseProblemException ppe) {
+            replacedCode = service.getReplaceCode(stack.peek().toString());
+            return new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
+        } catch (ImportsIncompleteException iie) {
+            replacedCode = service.getReplaceCode(stack.peek().toString());
+            return new Response(ResponseCode.IMPORTS_INCOMPLETE.getValue(), iie.getMessage());
+        } catch (Exception e) {
+            replacedCode = service.getReplaceCode(stack.peek().toString());
+            return new Response(ResponseCode.UNKNOWN_EXCEPTION.getValue(), e.getMessage());
+        }
+
+    }
+
 
 //    public static void main(String[] args) {
 //        IReplaceService service = new ReplaceService();
