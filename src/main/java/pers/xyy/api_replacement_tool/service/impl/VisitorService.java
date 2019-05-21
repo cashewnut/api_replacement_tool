@@ -5,7 +5,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.comments.LineComment;
+import com.github.javaparser.ast.comments.BlockComment;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
@@ -65,8 +65,10 @@ public class VisitorService implements IVisitorService {
         }
 
         addImports(replacedCode, api);//add imports
-        if (replace.getComment() != null)
-            mc.setComment(new LineComment(replace.getComment()));
+        if (replace.getComment() != null) {
+            Node node = findStatement(mc);
+            node.setComment(new BlockComment(replace.getComment()));
+        }
     }
 
     /**
