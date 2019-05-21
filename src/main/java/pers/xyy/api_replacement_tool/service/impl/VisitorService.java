@@ -5,6 +5,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
+import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
@@ -64,6 +65,8 @@ public class VisitorService implements IVisitorService {
         }
 
         addImports(replacedCode, api);//add imports
+        if (replace.getComment() != null)
+            mc.setComment(new LineComment(replace.getComment()));
     }
 
     /**
@@ -116,7 +119,7 @@ public class VisitorService implements IVisitorService {
                 if (methodDesc.getInvoker().isEmpty())
                     mc = mc.removeScope();
                 else
-                    mc.setScope(new NameExpr(methodDesc.getInvoker()));
+                    mc.setScope(new NameExpr(placeArgsHolder(methodDesc.getInvoker(), mc)));
             } else
                 mc.setScope(new NameExpr(placeArgsHolder(methodDesc.getInvoker(), mc)));
         }
@@ -170,6 +173,8 @@ public class VisitorService implements IVisitorService {
             Args arg = argsDesc.get(i);
             if (arg.getRelated() == null || !arg.getRelated())
                 newArgs.add(new NameExpr(arg.getName()));
+            else if (arg.getName().contains("$invoker"))
+                newArgs.add(new NameExpr(arg.getName().replace("$invoker", mc.getScope().get().toString())));
             else if (arg.getOperations() == null || arg.getOperations().isEmpty()) {
                 int index = Integer.parseInt(arg.getName().replace("$dArgs", ""));
                 newArgs.add(oldArgs.get(index));
@@ -177,8 +182,8 @@ public class VisitorService implements IVisitorService {
                 List<String> operations = arg.getOperations();
                 for (int j = 0; j < operations.size(); j++)
                     operations.set(j, placeArgsHolder(operations.get(j), mc));
-                if (operations.size() == 1) {
-                    newArgs.add(new NameExpr(operations.get(0).replace("$this = ", "")));
+                if (operations.size() == 1 && operations.get(0).startsWith("$this")) {
+                    newArgs.add(new NameExpr(placeArgsHolder(operations.get(0).replace("$this = ", ""), mc)));
                 } else {
                     /*
                       TODO 如果不是1的情况如何考虑
@@ -214,7 +219,7 @@ public class VisitorService implements IVisitorService {
         for (int j = 0; j < operations.size(); j++) {
             String operation = operations.get(j);
             if (operation.contains("$this")) {
-                if (firstThis) {
+                if (firstThis && operation.startsWith("$this")) {
                     operations.set(j, operation.replace("$this", argType + " " + argName));
                     firstThis = false;
                 } else
@@ -253,13 +258,15 @@ public class VisitorService implements IVisitorService {
             String str1 = origin.substring(0, i);
             int index = 0;
             i += 6;
-            while (Character.isDigit(origin.charAt(i))) {
+            while (i < origin.length() && Character.isDigit(origin.charAt(i))) {
                 index = index * 10 + (origin.charAt(i) - '0');
                 i++;
             }
             String str2 = origin.substring(i);
             origin = str1 + oldArgs.get(index) + str2;
         }
+        if (origin.contains("$invoker"))
+            origin = origin.replace("$invoker", mc.getScope().get().toString());
         return origin;
     }
 

@@ -7,6 +7,7 @@ public class Args {
     private String type;
     private String name;
     private Boolean related;
+    private String comment;
     private List<String> operations;
 
     public String getType() {
