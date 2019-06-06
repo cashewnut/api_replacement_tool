@@ -54,6 +54,7 @@ public class ReplaceService implements IReplaceService {
 
     @Override
     public Response analyze(String code) {
+        System.out.println(code);
         Response response = analyzeCode(code);
         stack.push(replacedCode.getCu().clone());
         return response;
