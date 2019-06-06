@@ -44,6 +44,7 @@ public class ReplaceService implements IReplaceService {
             String path = ApiReplacementToolApplication.class.getResource("/examples/ExampleA").toURI().getPath();
             String result = FileUtil.readFile(path);
             //System.out.println(result);
+            //System.out.println(result);
             return result;
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,6 +77,8 @@ public class ReplaceService implements IReplaceService {
     @Override
     public Response revert() {
         String code = stack.pop().toString();
+        System.out.println(code);
+        System.out.println("stack_size : " + stack.size());
         Response response = analyzeCode(code);
         if (stack.isEmpty())
             response.setResponseCode(ResponseCode.SUCCESS_CANNOT_REVERT.getValue());
