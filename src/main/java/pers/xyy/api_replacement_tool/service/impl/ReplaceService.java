@@ -53,20 +53,9 @@ public class ReplaceService implements IReplaceService {
 
     @Override
     public Response analyze(String code) {
-        try {
-            replacedCode = service.getReplaceCode(code);
-            stack.push(replacedCode.getCu().clone());
-            List<Line> lines = replacedCode.getLines();
-            for (Line line : lines) {
-                System.out.println(line.getContent());
-                System.out.println(line.getIndex());
-            }
-            return new Response(replacedCode.getLines());
-        } catch (ParseProblemException ppe) {
-            return new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
-        } catch (ImportsIncompleteException iie) {
-            return new Response(ResponseCode.IMPORTS_INCOMPLETE.getValue(), iie.getMessage());
-        }
+        Response response = analyzeCode(code);
+        stack.push(replacedCode.getCu().clone());
+        return response;
     }
 
     @Override
@@ -87,10 +76,10 @@ public class ReplaceService implements IReplaceService {
     @Override
     public Response revert() {
         String code = stack.pop().toString();
-        Response response = analyze(code);
+        Response response = analyzeCode(code);
         if (stack.isEmpty())
             response.setResponseCode(ResponseCode.SUCCESS_CANNOT_REVERT.getValue());
-        return analyze(code);
+        return response;
     }
 
     @Override
@@ -110,6 +99,22 @@ public class ReplaceService implements IReplaceService {
             return new Response(ResponseCode.UNKNOWN_EXCEPTION.getValue(), e.getMessage());
         }
 
+    }
+
+    private Response analyzeCode(String code) {
+        try {
+            replacedCode = service.getReplaceCode(code);
+            List<Line> lines = replacedCode.getLines();
+            for (Line line : lines) {
+                System.out.println(line.getContent());
+                System.out.println(line.getIndex());
+            }
+            return new Response(replacedCode.getLines());
+        } catch (ParseProblemException ppe) {
+            return new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
+        } catch (ImportsIncompleteException iie) {
+            return new Response(ResponseCode.IMPORTS_INCOMPLETE.getValue(), iie.getMessage());
+        }
     }
 
 
