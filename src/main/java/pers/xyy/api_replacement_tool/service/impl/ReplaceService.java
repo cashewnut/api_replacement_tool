@@ -108,10 +108,10 @@ public class ReplaceService implements IReplaceService {
         try {
             replacedCode = service.getReplaceCode(code);
             List<Line> lines = replacedCode.getLines();
-            for (Line line : lines) {
-                System.out.println(line.getContent());
-                System.out.println(line.getIndex());
-            }
+//            for (Line line : lines) {
+//                System.out.println(line.getContent());
+//                System.out.println(line.getIndex());
+//            }
             return new Response(replacedCode.getLines());
         } catch (ParseProblemException ppe) {
             return new Response(ResponseCode.CODE_SYNTAX.getValue(), ppe.getMessage());
