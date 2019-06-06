@@ -76,12 +76,14 @@ public class ReplaceService implements IReplaceService {
 
     @Override
     public Response revert() {
-        String code = stack.pop().toString();
-        System.out.println(code);
-        System.out.println("stack_size : " + stack.size());
-        Response response = analyzeCode(code);
-        if (stack.isEmpty())
+        if (stack.isEmpty()) {
+            Response response = new Response();
             response.setResponseCode(ResponseCode.SUCCESS_CANNOT_REVERT.getValue());
+            response.setMessage("Cannot Revert!");
+            return response;
+        }
+        String code = stack.pop().toString();
+        Response response = analyzeCode(code);
         return response;
     }
 
