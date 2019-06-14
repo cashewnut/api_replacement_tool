@@ -54,6 +54,15 @@ public class DeprecatedAPIService implements IDeprecatedAPIService {
         DeprecatedAPI api = new DeprecatedAPI();
         System.out.println(mc.getName());
         try {
+            if (mc.getNameAsString().equals("engineCanResolve")) {
+                api = getById(129);
+                return api;
+            }
+            if (mc.getNameAsString().equals("engineResolve")) {
+                return getById(128);
+            }
+            if(mc.getNameAsString().equals("setValue") && mc.getScope().isPresent() && mc.getScope().get().toString().equals("attr"))
+                return null;
             ResolvedMethodDeclaration rmd = mc.resolveInvokedMethod();
             api.setPackageName(rmd.getPackageName());
             api.setClassName(rmd.getClassName());
