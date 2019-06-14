@@ -101,7 +101,8 @@ public class VisitorService implements IVisitorService {
         //name
         mc.setName(methodDesc.getName());
         //args
-        mc.setArguments(generateNewArgs(methodDesc.getArgs(), mc));
+        if (methodDesc.getArgs() != null)
+            mc.setArguments(generateNewArgs(methodDesc.getArgs(), mc));
     }
 
     /**
@@ -128,7 +129,8 @@ public class VisitorService implements IVisitorService {
         //name
         mc.setName(methodDesc.getName());
         //args
-        mc.setArguments(generateNewArgs(methodDesc.getArgs(), mc));
+        if (methodDesc.getArgs() != null)
+            mc.setArguments(generateNewArgs(methodDesc.getArgs(), mc));
     }
 
     /**
@@ -160,7 +162,8 @@ public class VisitorService implements IVisitorService {
         //name
         mc.setName(method.getName());
         //args
-        mc.setArguments(generateNewArgs(method.getArgs(), rowMc));
+        if (method.getArgs() != null)
+            mc.setArguments(generateNewArgs(method.getArgs(), rowMc));
 
         return mc.toString();
     }
