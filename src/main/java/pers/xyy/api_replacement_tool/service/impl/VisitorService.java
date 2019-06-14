@@ -250,7 +250,7 @@ public class VisitorService implements IVisitorService {
         for (int i = 0; i < methods.size(); i++)
             origin = origin.replace("$m" + i, methods.get(i));
         if (origin.contains("$invoker"))
-            origin.replace("$invoker", mc.getScope().get().toString());
+            origin = origin.replace("$invoker", mc.getScope().get().toString());
         return origin;
     }
 
