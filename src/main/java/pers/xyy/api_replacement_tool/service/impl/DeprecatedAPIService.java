@@ -75,6 +75,8 @@ public class DeprecatedAPIService implements IDeprecatedAPIService {
                 rArgs = new StringBuilder(rArgs.substring(0, rArgs.length() - 1));
             api.setMethodArgs(rArgs.toString());
         } catch (RuntimeException e) {
+            if(mc.getScope().isPresent() && mc.getScope().get().toString().equals("NameImpl") && mc.getNameAsString().equals("create"))
+                return null;
             if (mc.getNameAsString().equals("create") && mc.getScope().isPresent() && mc.getScope().get().toString().equals("factory"))
                 return getById(50);
             throw new ImportsIncompleteException("check imports!");
