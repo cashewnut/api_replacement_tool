@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class VisitorService implements IVisitorService {
@@ -65,9 +66,9 @@ public class VisitorService implements IVisitorService {
         }
 
         addImports(replacedCode, api);//add imports
-        if (replace.getComment() != null) {
+        if (replace.getComments() != null) {
             Node node = findStatement(mc);
-            node.setComment(new BlockComment(replace.getComment()));
+            node.setComment(new BlockComment(String.join("\n", replace.getComments())));
         }
     }
 
@@ -144,7 +145,7 @@ public class VisitorService implements IVisitorService {
         List<String> methods = new ArrayList<>();
         for (Method methodDesc : methodDescs)
             methods.add(transMethod(methodDesc, mc));
-        mc.replace(new NameExpr(placeMethodsHolder(replace.getOperations().get(0), methods)));
+        mc.replace(new NameExpr(placeMethodsHolder(mc, replace.getOperations().get(0), methods)));
     }
 
     //把method转成String,和replaceType3有很多重复代码，可以考虑重构
@@ -245,9 +246,11 @@ public class VisitorService implements IVisitorService {
     }
 
     //更换占位符，$m0,$m1...
-    private String placeMethodsHolder(String origin, List<String> methods) {
+    private String placeMethodsHolder(MethodCallExpr mc, String origin, List<String> methods) {
         for (int i = 0; i < methods.size(); i++)
             origin = origin.replace("$m" + i, methods.get(i));
+        if (origin.contains("$invoker"))
+            origin.replace("$invoker", mc.getScope().get().toString());
         return origin;
     }
 

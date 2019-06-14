@@ -54,4 +54,8 @@ public class DBUtil {
         }
     }
 
+    public static void main(String[] args) {
+        Connection connection = DBUtil.getConnection();
+    }
+
 }

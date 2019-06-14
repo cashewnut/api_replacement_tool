@@ -9,6 +9,7 @@ public class Replace {
     private List<Method> methods;
     private List<String> operations;
     private String comment;
+    private List<String> comments;
 
     public List<Method> getMethods() {
         return methods;
@@ -32,6 +33,14 @@ public class Replace {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public List<String> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<String> comments) {
+        this.comments = comments;
     }
 
     public static void main(String[] args) {
