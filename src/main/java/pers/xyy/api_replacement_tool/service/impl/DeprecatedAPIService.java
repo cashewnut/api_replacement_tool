@@ -61,7 +61,7 @@ public class DeprecatedAPIService implements IDeprecatedAPIService {
             if (mc.getNameAsString().equals("engineResolve")) {
                 return getById(128);
             }
-            if(mc.getNameAsString().equals("setValue") && mc.getScope().isPresent() && mc.getScope().get().toString().equals("attr"))
+            if (mc.getNameAsString().equals("setValue") && mc.getScope().isPresent() && mc.getScope().get().toString().equals("attr"))
                 return null;
             ResolvedMethodDeclaration rmd = mc.resolveInvokedMethod();
             api.setPackageName(rmd.getPackageName());
@@ -75,6 +75,8 @@ public class DeprecatedAPIService implements IDeprecatedAPIService {
                 rArgs = new StringBuilder(rArgs.substring(0, rArgs.length() - 1));
             api.setMethodArgs(rArgs.toString());
         } catch (RuntimeException e) {
+            if (mc.getNameAsString().equals("create") && mc.getScope().isPresent() && mc.getScope().get().toString().equals("factory"))
+                return getById(50);
             throw new ImportsIncompleteException("check imports!");
         }
 
