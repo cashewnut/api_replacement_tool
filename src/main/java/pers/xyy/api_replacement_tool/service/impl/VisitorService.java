@@ -5,7 +5,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.NodeList;
-import com.github.javaparser.ast.comments.BlockComment;
+import com.github.javaparser.ast.comments.LineComment;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class VisitorService implements IVisitorService {
@@ -68,7 +67,7 @@ public class VisitorService implements IVisitorService {
         addImports(replacedCode, api);//add imports
         if (replace.getComments() != null) {
             Node node = findStatement(mc);
-            node.setComment(new BlockComment(String.join("\n", replace.getComments())));
+            node.setComment(new LineComment(String.join("\n", replace.getComments())));
         }
     }
 
